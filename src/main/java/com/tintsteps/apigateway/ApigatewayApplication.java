@@ -1,4 +1,4 @@
-package com.tintsteps.api_gateway;
+package com.tintsteps.apigateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
