@@ -1,58 +1,46 @@
 package com.tintsteps.apigateway.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.security.PublicKey;
-
 @Component
-@RequiredArgsConstructor
+@Slf4j
 public class TokenBlacklistFilter implements GlobalFilter, Ordered {
 
-    private final ReactiveStringRedisTemplate redisTemplate;
-    private final PublicKey publicKey; // We'll need to provide this
+    private static final String BLACKLIST_PREFIX = "blacklist:";
+
+    @Autowired
+    private ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
-        String authHeader = request.getHeaders().getFirst("Authorization");
+        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+        final String bearerPrefix = "Bearer ";
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            try {
-                Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(publicKey)
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody();
-                String jti = claims.getId();
+        // Perform a case-insensitive check for the "Bearer " prefix.
+        if (authHeader != null && authHeader.toLowerCase().startsWith(bearerPrefix.toLowerCase())) {
+            String jwt = authHeader.substring(bearerPrefix.length());
+            String key = BLACKLIST_PREFIX + jwt;
+            log.info("Checking if token is blacklisted with key: {}", key);
 
-                // Check if the JTI is in the blacklist
-                return redisTemplate.hasKey(jti)
-                        .flatMap(isBlacklisted -> {
-                            if (Boolean.TRUE.equals(isBlacklisted)) {
-                                // If blacklisted, reject the request
-                                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                                return exchange.getResponse().setComplete();
-                            }
-                            // If not blacklisted, continue the filter chain
-                            return chain.filter(exchange);
-                        });
-            } catch (Exception e) {
-                // If token parsing fails, just continue the chain.
-                // The resource server will handle the invalid signature.
-                return chain.filter(exchange);
-            }
+            return reactiveRedisTemplate.hasKey(key)
+                    .flatMap(isBlacklisted -> {
+                        log.info("Is token with key '{}' blacklisted? {}", key, isBlacklisted);
+                        if (Boolean.TRUE.equals(isBlacklisted)) {
+                            log.warn("Blacklisted token received. Rejecting request.");
+                            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                            return exchange.getResponse().setComplete();
+                        }
+                        return chain.filter(exchange);
+                    });
         }
 
         return chain.filter(exchange);
@@ -60,7 +48,7 @@ public class TokenBlacklistFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        // Run this filter just before the security filters.
+        // Run before Spring Security's authentication filters
         return -100;
     }
 }

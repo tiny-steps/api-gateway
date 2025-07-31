@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
@@ -29,16 +31,16 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
-                        // Permit all auth-related and service discovery endpoints
-                        .pathMatchers("/api/auth/**", "/oauth2/**", "/eureka/**").permitAll()
-                        // All other requests must be authenticated
+                        .pathMatchers("/api/auth/**").permitAll()
                         .anyExchange().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .publicKey((RSAPublicKey) publicKey())
-                        )
-                );
+                .oauth2ResourceServer(spec -> spec.jwt(Customizer.withDefaults()));
+
+        // Enforce statelessness by disabling the session-based security context repository.
+        // This ensures that the security context is not saved between requests,
+        // forcing re-authentication and allowing the TokenBlacklistFilter to work correctly.
+        http.securityContextRepository(NoOpServerSecurityContextRepository.getInstance());
+
         return http.build();
     }
 
