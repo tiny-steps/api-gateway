@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/api/auth/**").permitAll()
+                        .pathMatchers("/oauth2/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(spec -> spec.jwt(Customizer.withDefaults()));
