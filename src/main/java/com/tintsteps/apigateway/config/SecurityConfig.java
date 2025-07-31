@@ -14,14 +14,14 @@ public class SecurityConfig {
     @SuppressWarnings("all")
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                .authorizeExchange(exchanges -> exchanges
-                        // This allows login/token requests to pass through without a token
-                        .pathMatchers("/oauth2/**", "/.well-known/**").permitAll()
-                        // All other requests must be authenticated
-                        .anyExchange().authenticated()
-                )
-                .oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt)
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .build();
+            .authorizeExchange(exchanges -> exchanges
+                // Allow unauthenticated access to auth endpoints and token endpoints
+                .pathMatchers("/api/auth/**", "/oauth2/**", "/.well-known/**").permitAll()
+                // All other requests must be authenticated
+                .anyExchange().authenticated()
+            )
+            .oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt)
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .build();
     }
 }
