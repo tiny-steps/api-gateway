@@ -6,3 +6,6 @@ data:
   SPRING_APPLICATION_NAME: "ts-api-gateway"
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: "http://ts-auth-service:8081"
   EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://ts-service-registry:8761/eureka/"
+internal:
+  api:
+    secret: ${INTERNAL_API_SECRET}

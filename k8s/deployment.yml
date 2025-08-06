@@ -22,3 +22,9 @@ spec:
                 name: ts-api-gateway-config
             - secretRef:
                 name: ts-user-db-credentials
+          env:
+              - name: INTERNAL_API_SECRET  # This creates the environment variable
+                valueFrom:
+                  secretKeyRef:
+                    name: internal-api-secret   # The name of our new Secret object
+                    key: secret-value
