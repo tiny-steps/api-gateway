@@ -17,9 +17,9 @@ spring:
   security:
     oauth2:
       resourceserver:
-        jwt:
           # The Gateway also validates tokens using the Auth Service's issuer URI
-          issuer-uri: http://localhost:8081
+          jwt:
+            issuer-uri: http://localhost:8081
 
 # Eureka client configuration
 eureka:
