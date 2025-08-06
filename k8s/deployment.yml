@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-api-gateway-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-api-gateway
+  template:
+    metadata:
+      labels:
+        app: ts-api-gateway
+    spec:
+      containers:
+        - name: ts-api-gateway
+          image: subhankarm2312/ts-api-gateway:f6b0bf3-20250805102201 # This will be updated by the pipeline
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: ts-api-gateway-config
+            - secretRef:
+                name: ts-user-db-credentials
