@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service # A simple, clean name for your app to use
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+  selector:
+    # This selector points to the pod created by the Helm chart
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: tiny-steps-redis
+    role: master
