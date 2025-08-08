@@ -14,7 +14,22 @@ spec:
     spec:
       containers:
         - name: ts-api-gateway
-          image: subhankarm2312/ts-api-gateway:e0be2bb-20250806135959 # This will be updated by the pipeline
+          image: subhankarm2312/ts-api-gateway:e0be2bb-20250806135959 # This will be updated by the pipeline          env:
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xms128m -Xmx256m"
+            - name: INTERNAL_API_SECRET  # This creates the environment variable
+              valueFrom:
+                secretKeyRef:
+                  name: internal-api-secret   # The name of our new Secret object
+                  key: secret-value
+          resources:
+            requests:
+              memory: "256Mi" # Request 256 MiB of memory
+              cpu: "250m"      # Request 0.25 of a CPU core
+            limits:
+              memory: "512Mi" # Limit the pod to a max of 512 MiB
+              cpu: "500m"      # Limit the pod to a max of 0.5 of a CPU core
           ports:
             - containerPort: 8080
           envFrom:
@@ -22,9 +37,4 @@ spec:
                 name: ts-api-gateway-config
             - secretRef:
                 name: ts-user-db-credentials
-          env:
-              - name: INTERNAL_API_SECRET  # This creates the environment variable
-                valueFrom:
-                  secretKeyRef:
-                    name: internal-api-secret   # The name of our new Secret object
-                    key: secret-value
+
