@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ts-api-gateway
-          image: subhankarm2312/ts-api-gateway:e0be2bb-20250806135959 # This will be updated by the pipeline          env:
+          image: subhankarm2312/ts-api-gateway:ff6076b-20250808063332 # This will be updated by the pipeline          env:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-Xms128m -Xmx256m"
