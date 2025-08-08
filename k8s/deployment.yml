@@ -25,8 +25,8 @@ spec:
                   key: secret-value
           resources:
             requests:
-              memory: "256Mi" # Request 256 MiB of memory
-              cpu: "250m"      # Request 0.25 of a CPU core
+              memory: "128Mi" # Request 256 MiB of memory
+              cpu: "100m"        # Request 0.25 of a CPU core
             limits:
               memory: "512Mi" # Limit the pod to a max of 512 MiB
               cpu: "500m"      # Limit the pod to a max of 0.5 of a CPU core
