@@ -6,6 +6,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -16,18 +17,28 @@ import reactor.core.publisher.Mono;
 public class TokenBlacklistFilter implements GlobalFilter, Ordered {
 
     private static final String BLACKLIST_PREFIX = "blacklist:";
+    private static final String BEARER_PREFIX = "Bearer ";
 
     @Autowired
     private ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-        final String bearerPrefix = "Bearer ";
+        // First, try to get the token from the "jwt" cookie
+        HttpCookie jwtCookie = exchange.getRequest().getCookies().getFirst("jwt");
+        String jwt = null;
 
-        // Perform a case-insensitive check for the "Bearer " prefix.
-        if (authHeader != null && authHeader.toLowerCase().startsWith(bearerPrefix.toLowerCase())) {
-            String jwt = authHeader.substring(bearerPrefix.length());
+        if (jwtCookie != null) {
+            jwt = jwtCookie.getValue();
+        } else {
+            // If the cookie is not present, fall back to the Authorization header
+            String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+            if (authHeader != null && authHeader.toLowerCase().startsWith(BEARER_PREFIX.toLowerCase())) {
+                jwt = authHeader.substring(BEARER_PREFIX.length());
+            }
+        }
+
+        if (jwt != null) {
             String key = BLACKLIST_PREFIX + jwt;
             log.info("Checking if token is blacklisted with key: {}", key);
 
@@ -43,6 +54,7 @@ public class TokenBlacklistFilter implements GlobalFilter, Ordered {
                     });
         }
 
+        // If no token is found in either the cookie or the header, continue the filter chain
         return chain.filter(exchange);
     }
 
