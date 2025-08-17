@@ -15,14 +15,12 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String authServerUrl;
 
@@ -72,4 +70,3 @@ public class SecurityConfig {
         }
     }
 }
-
