@@ -2,15 +2,18 @@ package com.tintsteps.apigateway.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.WebFilter;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -23,6 +26,15 @@ import java.util.Base64;
 public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String authServerUrl;
+
+    @Autowired
+    private JwtCookieToHeaderFilter jwtCookieToHeaderFilter;
+
+    @Bean
+    @Order(-1) // Ensure it runs before Spring Security
+    public WebFilter jwtCookieToHeaderWebFilter() {
+        return jwtCookieToHeaderFilter;
+    }
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
