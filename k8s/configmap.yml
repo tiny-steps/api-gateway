@@ -1,10 +1,14 @@
+# In your ts-api-gateway-config ConfigMap or application.yml
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ts-api-gateway-config
 data:
-  # This ConfigMap only contains flat key-value pairs for Spring Boot
   SPRING_APPLICATION_NAME: "ts-api-gateway"
   SPRING_DATA_REDIS_HOST: "redis-service"
+  # This tells Spring where to find the issuer
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: "http://ts-auth-service:8081"
+  # You might need to add this one explicitly so Spring can find the keys
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://ts-auth-service:8081/oauth2/jwks"
   EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://ts-service-registry:8761/eureka/"
