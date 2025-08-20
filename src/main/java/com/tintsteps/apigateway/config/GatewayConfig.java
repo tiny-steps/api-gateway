@@ -86,6 +86,8 @@ public class GatewayConfig {
                 // Session Service routes
                 .route("ts-session-service", r -> r.path("/api/v1/sessions/**")
                         .uri("lb://ts-session-service"))
+                .route("ts-session-service", r -> r.path("/api/v1/session-types/**")
+                        .uri("lb://ts-session-service"))
 
                 // Payment Service routes
                 .route("ts-payment-service", r -> r.path("/api/v1/payments/**")
