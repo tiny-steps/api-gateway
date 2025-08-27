@@ -102,7 +102,7 @@ public class GatewayConfig {
                                                 .uri("lb://ts-payment-service"))
 
                                 // Report Service routes
-                                .route("ts-report-service", r -> r.path("/api/reports/**")
+                                .route("ts-report-service", r -> r.path("/api/v1/reports/**")
                                                 .uri("lb://ts-report-service"))
 
                                 // Notification Service routes
