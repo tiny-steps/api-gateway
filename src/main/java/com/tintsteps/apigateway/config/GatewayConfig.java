@@ -72,7 +72,7 @@ public class GatewayConfig {
                         .uri("lb://ts-patient-service"))
 
                 // Timing Service routes
-                .route("ts-timing-service", r -> r.path("/api/v1/timing/**")
+                .route("ts-timing-service", r -> r.path("/api/v1/timings/**")
                         .uri("lb://ts-timing-service"))
 
                 // Consultation Service routes
