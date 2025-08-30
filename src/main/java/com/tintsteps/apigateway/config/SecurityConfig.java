@@ -39,11 +39,9 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/api/auth/**", "/oauth2/**").permitAll()
-                        .anyExchange().authenticated()
-                )
+                        .anyExchange().authenticated())
                 .oauth2ResourceServer(spec -> spec.jwt(jwt -> jwt
-                        .jwtDecoder(jwtDecoder())
-                ));
+                        .jwtDecoder(jwtDecoder())));
 
         http.securityContextRepository(NoOpServerSecurityContextRepository.getInstance());
 
@@ -55,26 +53,27 @@ public class SecurityConfig {
         return new ReactiveJwtDecoder() {
             @Override
             public Mono<Jwt> decode(String token) throws Exception {
-                log.info("🔐 JWT Decoder: Attempting to decode token: {}", token.substring(0, Math.min(50, token.length())) + "...");
-                
+                log.info("🔐 JWT Decoder: Attempting to decode token: {}",
+                        token.substring(0, Math.min(50, token.length())) + "...");
+
                 try {
                     // Try to create a decoder for the issuer URI
                     String issuerUri = "http://ts-auth-service:8081";
                     log.info("🔐 JWT Decoder: Using issuer URI: {}", issuerUri);
-                    
+
                     ReactiveJwtDecoder decoder = NimbusReactiveJwtDecoder.withIssuerLocation(issuerUri).build();
                     return decoder.decode(token)
                             .doOnSuccess(jwt -> {
-                                log.info("✅ JWT Decoder: Successfully decoded JWT. Subject: {}, Claims: {}", 
-                                    jwt.getSubject(), jwt.getClaims());
+                                log.info("✅ JWT Decoder: Successfully decoded JWT. Subject: {}, Claims: {}",
+                                        jwt.getSubject(), jwt.getClaims());
                             })
                             .doOnError(error -> {
-                                log.error("❌ JWT Decoder: Failed to decode JWT: {} - {}", 
-                                    error.getClass().getSimpleName(), error.getMessage());
+                                log.error("❌ JWT Decoder: Failed to decode JWT: {} - {}",
+                                        error.getClass().getSimpleName(), error.getMessage());
                             });
                 } catch (Exception e) {
-                    log.error("❌ JWT Decoder: Exception during decoder creation: {} - {}", 
-                        e.getClass().getSimpleName(), e.getMessage());
+                    log.error("❌ JWT Decoder: Exception during decoder creation: {} - {}",
+                            e.getClass().getSimpleName(), e.getMessage());
                     return Mono.error(e);
                 }
             }
