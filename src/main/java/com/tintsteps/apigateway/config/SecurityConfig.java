@@ -56,11 +56,11 @@ public class SecurityConfig {
                 log.info("🔐 JWT Decoder: Attempting to decode token: {}",
                         token.substring(0, Math.min(50, token.length())) + "...");
 
-                                try {
+                try {
                     // Use JWK endpoint directly since discovery endpoint is blocked
                     String jwkUri = "http://ts-auth-service:8081/oauth2/jwks";
                     log.info("🔐 JWT Decoder: Using JWK URI: {}", jwkUri);
-                    
+
                     ReactiveJwtDecoder decoder = NimbusReactiveJwtDecoder.withJwkSetUri(jwkUri).build();
                     return decoder.decode(token)
                             .doOnSuccess(jwt -> {
