@@ -52,16 +52,16 @@ public class SecurityConfig {
     public ReactiveJwtDecoder jwtDecoder() {
         return new ReactiveJwtDecoder() {
             @Override
-            public Mono<Jwt> decode(String token) throws Exception {
+            public Mono<Jwt> decode(String token) {
                 log.info("🔐 JWT Decoder: Attempting to decode token: {}",
                         token.substring(0, Math.min(50, token.length())) + "...");
 
-                try {
-                    // Try to create a decoder for the issuer URI
-                    String issuerUri = "http://ts-auth-service:8081";
-                    log.info("🔐 JWT Decoder: Using issuer URI: {}", issuerUri);
-
-                    ReactiveJwtDecoder decoder = NimbusReactiveJwtDecoder.withIssuerLocation(issuerUri).build();
+                                try {
+                    // Use JWK endpoint directly since discovery endpoint is blocked
+                    String jwkUri = "http://ts-auth-service:8081/oauth2/jwks";
+                    log.info("🔐 JWT Decoder: Using JWK URI: {}", jwkUri);
+                    
+                    ReactiveJwtDecoder decoder = NimbusReactiveJwtDecoder.withJwkSetUri(jwkUri).build();
                     return decoder.decode(token)
                             .doOnSuccess(jwt -> {
                                 log.info("✅ JWT Decoder: Successfully decoded JWT. Subject: {}, Claims: {}",
