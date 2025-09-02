@@ -28,7 +28,7 @@ spec:
               memory: "512Mi"
               cpu: "500m"
           ports:
-            - containerPort: 8092
+            - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: ts-api-gateway-config
