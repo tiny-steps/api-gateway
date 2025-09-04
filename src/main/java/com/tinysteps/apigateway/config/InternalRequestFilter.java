@@ -1,4 +1,4 @@
-package com.tintsteps.apigateway.config;
+package com.tinysteps.apigateway.config;
 
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;

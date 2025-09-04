@@ -1,4 +1,4 @@
-package com.tintsteps.apigateway;
+package com.tinysteps.apigateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

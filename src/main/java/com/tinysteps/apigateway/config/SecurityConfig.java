@@ -1,5 +1,5 @@
-// In api-gateway/src/main/java/com/tintsteps/apigateway/config/SecurityConfig.java
-package com.tintsteps.apigateway.config;
+// In api-gateway/src/main/java/com/tinysteps/apigateway/config/SecurityConfig.java
+package com.tinysteps.apigateway.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
