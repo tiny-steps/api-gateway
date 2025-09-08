@@ -20,7 +20,7 @@ public class GatewayConfig {
                                 // User Service routes
                                 .route("ts-user-service-users", r -> r.path("/api/v1/users/**")
                                                 .uri("lb://ts-user-service"))
-                        .route("ts-user-service-user-branches", r -> r.path("api/v1/user-branches/**")
+                        .route("ts-user-service-user-branches", r -> r.path("/api/v1/user-branches/**")
                                 .uri("lb://ts-user-service"))
 
 
