@@ -2,6 +2,7 @@
 package com.tinysteps.apigateway.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 // Import this class
@@ -25,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
     @Autowired
     private JwtCookieToHeaderFilter jwtCookieToHeaderFilter;
+
+    @Value( "${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
 
     @Bean
     // Change the order to run before Spring Security's filters
@@ -58,7 +62,7 @@ public class SecurityConfig {
 
                 try {
                     // Use JWK endpoint directly since discovery endpoint is blocked
-                    String jwkUri = "http://ts-auth-service:8081/oauth2/jwks";
+                    String jwkUri = issuerUri+"/oauth2/jwks";
                     log.info("🔐 JWT Decoder: Using JWK URI: {}", jwkUri);
 
                     ReactiveJwtDecoder decoder = NimbusReactiveJwtDecoder.withJwkSetUri(jwkUri).build();
