@@ -6,7 +6,8 @@ metadata:
   name: ts-api-gateway-config
 data:
   SPRING_APPLICATION_NAME: "ts-api-gateway"
-  SPRING_DATA_REDIS_HOST: "redis-service"
+  SPRING_DATA_REDIS_HOST: "redis-master.infrastructure.svc.cluster.local"
+  SPRING_DATA_REDIS_PORT: "6379"
   # This tells Spring where to find the issuer
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI: "http://ts-auth-service:8081"
   # You might need to add this one explicitly so Spring can find the keys
